@@ -1,0 +1,23 @@
+{
+  "name": "solution_explorer_poc",
+  "version": "0.1.0",
+  "description": "",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "postinstall": "minstall --no-hoist aurelia-* --trust-local-modules ."
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/process-engine/solution_explorer_poc.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/process-engine/solution_explorer_poc/issues"
+  },
+  "homepage": "https://github.com/process-engine/solution_explorer_poc#readme",
+  "devDependencies": {
+    "minstall": "^3.3.0",
+    "typescript": "^2.9.1"
+  }
+}
