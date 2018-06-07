@@ -1,3 +1,3 @@
 export interface IIdentity {
-  name: string;
+    name: string;
 }
