@@ -1,0 +1,14 @@
+{
+  "name": "solution_explorer_service",
+  "version": "0.1.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@essential-projects/tslint-config": "^1.0.0"
+  }
+}
