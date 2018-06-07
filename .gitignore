@@ -8,7 +8,7 @@ package-lock.json
 yarn.lock
 
 # build directories
-*/dist
+dist
 
 # auto-generated schemas and documentation
 doc

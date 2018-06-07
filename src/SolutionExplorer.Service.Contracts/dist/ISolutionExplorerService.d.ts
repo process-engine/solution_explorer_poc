@@ -1,6 +1,6 @@
-import { IIdentity, ISolution, IDiagram } from './index';
+import { ISolution, IDiagram } from 'solutionexplorer.contracts';
 export interface ISolutionExplorerService {
-    openSolution(identity: IIdentity, pathspec: string): boolean;
+    openSolution(pathspec: string): boolean;
     loadSolution(): ISolution;
     saveSolution(solution: ISolution, path: string): boolean;
     loadDiagram(diagramName: string): IDiagram;

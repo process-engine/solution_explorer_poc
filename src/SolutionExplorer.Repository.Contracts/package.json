@@ -1,13 +1,16 @@
 {
-  "name": "solutionexplorer.repository.processengine.contracts",
+  "name": "solutionexplorer.repository.contracts",
   "version": "0.0.1",
   "description": "",
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "tsc --outdir dist --declaration"
+    "build": "rm -fr dist && tsc --outdir dist --declaration"
   },
   "author": "",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "solutionexplorer.contracts": "0.0.1"
+  }
 }

@@ -4,14 +4,13 @@
   },
   "compilerOptions": {
     "module": "commonjs",
-    "target": "es5",
+    "target": "es2017",
     "jsx": "react",
     "lib": [
       "es2017",
       "dom"
     ],
     "sourceMap": true,
-    "downlevelIteration": true,
     "experimentalDecorators": true
   }
 }
