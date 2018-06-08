@@ -26,13 +26,14 @@ async function start() {
   container.validateDependencies();
 
   try {
-    const service = await container.resolveAsync('SolutionExplorer');
+
     console.log(service);
 
     console.log('Bootstrapper started successfully.');
+    return await container.resolveAsync('SolutionExplorer');
   } catch(error) {
     console.log('Bootstrapper failed to start.', error);
   }
 }
 
-start();
+module.exports = start();
