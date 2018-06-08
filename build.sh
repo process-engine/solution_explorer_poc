@@ -11,5 +11,6 @@ buildPackage "SolutionExplorer.Contracts"
 buildPackage "SolutionExplorer.Repository.Contracts"
 buildPackage "SolutionExplorer.Service.Contracts"
 
+buildPackage "SolutionExplorer.Repository.FileSystem"
 buildPackage "SolutionExplorer.Repository.ProcessEngine"
 buildPackage "SolutionExplorer.Service"
