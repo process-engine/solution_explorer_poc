@@ -1,2 +1,2 @@
-export * from './IProcessEngineRepository';
+export * from './ISolutionExplorerRepository';
 export * from './IPagination';

@@ -1,6 +1,6 @@
 import {IDiagram} from 'solutionexplorer.contracts';
 
-export interface IProcessEngineRepository {
+export interface ISolutionExplorerRepository {
   openPath(pathspec: string): Promise<boolean>;
 
   getDiagrams(): Promise<Array<IDiagram>>;

@@ -1,10 +1,10 @@
 import {IQueryClause} from '@essential-projects/core_contracts';
-import {IPagination, IProcessEngineRepository} from 'solutionexplorer.repository.contracts';
+import {IPagination, ISolutionExplorerRepository} from 'solutionexplorer.repository.contracts';
 import {IProcessDefEntity} from '@process-engine/process_engine_contracts';
 import {IDiagram} from 'solutionexplorer.contracts';
 import {get, post, plugins, Response, RequestOptions} from 'popsicle';
 
-export class SolutionExplorerProcessEngineRepository implements IProcessEngineRepository {
+export class SolutionExplorerProcessEngineRepository implements ISolutionExplorerRepository {
 
   private _baseUri: string;
 

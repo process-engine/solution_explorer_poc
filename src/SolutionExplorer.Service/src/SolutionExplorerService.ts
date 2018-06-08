@@ -1,13 +1,13 @@
 import {ISolutionExplorerService} from 'solutionexplorer.service.contracts';
 import {ISolution, IDiagram} from 'solutionexplorer.contracts';
-import {IProcessEngineRepository} from 'solutionexplorer.repository.contracts';
+import {ISolutionExplorerRepository} from 'solutionexplorer.repository.contracts';
 
 export class SolutionExplorerService implements ISolutionExplorerService {
 
-  private _repository: IProcessEngineRepository;
+  private _repository: ISolutionExplorerRepository;
   private _pathspec: string;
 
-  constructor(repository: IProcessEngineRepository) {
+  constructor(repository: ISolutionExplorerRepository) {
     this._repository = repository;
   }
 
