@@ -4,7 +4,19 @@ The solution explorer service provides an API to load and save solutions.
 
 ## Motivation
 
-This serves as a proof of concept for the further development of the "Solution Explorer".
+This serves as a proof of concept for the further development of the "Solution
+Explorer".
+
+## Setup
+
+To install dependencies:
+`npm install`
+
+To build the project:
+`npm run build`
+
+To run the tests:
+`npm test`
 
 ## Usage
 
