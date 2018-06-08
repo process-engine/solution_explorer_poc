@@ -26,9 +26,6 @@ async function start() {
   container.validateDependencies();
 
   try {
-
-    console.log(service);
-
     console.log('Bootstrapper started successfully.');
     return await container.resolveAsync('SolutionExplorer');
   } catch(error) {

@@ -8,10 +8,6 @@ export class SolutionExplorerProcessEngineRepository implements IProcessEngineRe
 
   private _baseUri: string;
 
-  constructor() {
-    console.log('Create ' + this);
-  }
-
   public async openPath(pathspec: string): Promise<boolean> {
     if (pathspec.endsWith('/')) {
       pathspec = pathspec.substr(0, pathspec.length - 1);
