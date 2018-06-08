@@ -21,6 +21,10 @@ const solution: ISolution = await service.loadSolution();
 solution.uri;       // -> http://localhost:8000
 solution.diagrams;  // -> [ { name: 'Prozess', (...) }, (...) ]
 
+// now edit the solution, for example
+solution.diagrams[0].xml = (...);
+
+await service.saveSolution(solution);
 ```
 
 ## Storage
