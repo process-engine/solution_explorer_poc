@@ -2,6 +2,10 @@
 
 The solution explorer service provides an API to load and save solutions.
 
+## Motivation
+
+This serves as a proof of concept for the further development of the "Solution Explorer".
+
 ## Usage
 
 ```typescript
