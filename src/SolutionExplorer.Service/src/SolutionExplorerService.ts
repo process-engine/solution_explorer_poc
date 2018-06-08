@@ -4,28 +4,44 @@ import {IProcessEngineRepository} from 'solutionexplorer.repository.contracts';
 
 export class SolutionExplorerService implements ISolutionExplorerService {
 
-  public SolutionExplorerService(repo: IProcessEngineRepository) {
-    console.log(repo);
+  private _repository: IProcessEngineRepository;
+  private _pathspec: string;
+
+  constructor(repository: IProcessEngineRepository) {
+    this._repository = repository;
   }
 
-  public openSolution(pathspec: string): boolean {
-    return null;
+  public async openSolution(pathspec: string): Promise<boolean> {
+    const success: boolean = await this._repository.openPath(pathspec);
+    if (success) {
+      this._pathspec = pathspec;
+    }
+    return Promise.resolve(true);
   }
 
-  public loadSolution(): ISolution {
-    return null;
+  public async loadSolution(): Promise<ISolution> {
+    const diagrams: Array<IDiagram> =  await this._repository.getDiagrams();
+    return {
+      diagrams: diagrams,
+      name: this._pathspec,
+      uri: this._pathspec,
+    };
   }
 
-  public saveSolution(solution: ISolution): boolean {
-    return null;
+  public async saveSolution(solution: ISolution): Promise<boolean> {
+    const promises: Array<Promise<boolean>> = solution.diagrams.map((diagram: IDiagram) => {
+      return this.saveDiagram(diagram);
+    });
+    await Promise.all(promises);
+
+    return Promise.resolve(true);
   }
 
-  public loadDiagram(diagramName: string): IDiagram {
-    return null;
+  public loadDiagram(diagramName: string): Promise<IDiagram> {
+    return this._repository.getDiagramByName(diagramName);
   }
 
-  public saveDiagram(diagram: IDiagram): boolean {
-    return null;
+  public saveDiagram(diagram: IDiagram): Promise<boolean> {
+    return this._repository.saveDiagram(diagram);
   }
-
 }

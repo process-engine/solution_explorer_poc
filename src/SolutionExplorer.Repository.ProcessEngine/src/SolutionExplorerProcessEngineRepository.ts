@@ -1,16 +1,27 @@
+import {IQueryClause} from '@essential-projects/core_contracts';
 import {IPagination, IProcessEngineRepository} from 'solutionexplorer.repository.contracts';
 import {IProcessDefEntity} from '@process-engine/process_engine_contracts';
 import {IDiagram} from 'solutionexplorer.contracts';
-import {get, plugins} from 'popsicle';
+import {get, post, plugins, Response, RequestOptions} from 'popsicle';
 
 export class SolutionExplorerProcessEngineRepository implements IProcessEngineRepository {
 
-  public SolutionExplorerProcessEngineRepository() {
+  private _baseUri: string;
 
+  constructor() {
+    console.log('Create ' + this);
+  }
+
+  public async openPath(pathspec: string): Promise<boolean> {
+    if (pathspec.endsWith('/')) {
+      pathspec = pathspec.substr(0, pathspec.length - 1);
+    }
+    this._baseUri = `${pathspec}/datastore/ProcessDef`;
+    return Promise.resolve(true);
   }
 
   public async getDiagrams(): Promise<Array<IDiagram>> {
-    const response = await get('http://localhost:8000/datastore/ProcessDef?limit="ALL"')
+    const response: Response = await get(`${this._baseUri}/?limit="ALL"`)
       .use(plugins.parse(['json']));
 
     const data: IPagination<IProcessDefEntity> = response.body;
@@ -21,23 +32,50 @@ export class SolutionExplorerProcessEngineRepository implements IProcessEngineRe
     return diagrams;
   }
 
-  public saveDiagram(diagramToSave: IDiagram): Promise<void> {
-    return null;
+  public async getDiagramByName(diagramName: string): Promise<IDiagram> {
+    const query: IQueryClause = {
+      attribute: 'name',
+      operator: '=',
+      value: diagramName,
+    };
+
+    const url: string = `${this._baseUri}/?query=${JSON.stringify(query)}`;
+
+    const response: Response = await get(url)
+      .use(plugins.parse(['json']));
+
+    const data: IPagination<IProcessDefEntity> = response.body;
+    const processDefList: Array<IProcessDefEntity> = data.data;
+
+    const diagrams: IDiagram = this._mapProcessDefToDiagram(processDefList[0]);
+
+    return diagrams;
   }
 
-  private _mapProcessDefToDiagram(processDef: IProcessDefEntity): IDiagram {
+  public async saveDiagram(diagramToSave: IDiagram): Promise<boolean> {
+    const options: RequestOptions = {
+      url: `${diagramToSave.uri}/updateBpmn`,
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+          xml: diagramToSave.xml,
+      }),
+    };
+    const response: Response = await post(options)
+      .use(plugins.parse(['json']));
+
+    const body: {result: boolean} = response.body;
+
+    return Promise.resolve(body.result);
+  }
+
+  private _mapProcessDefToDiagram = (processDef: IProcessDefEntity): IDiagram => {
     const diagram: IDiagram = {
       name: processDef.name,
       xml: processDef.xml,
-      uri: processDef.id,
+      uri: `${this._baseUri}/${processDef.id}`,
     };
     return diagram;
   }
-
-  // public async getProcesses(): Promise<IPagination<IProcessEntity>> {
-  //   const url: string = `${environment.processengine.routes.processInstances}?expandCollection=["processDef"]`;
-  //   const response: Response = await this.http.fetch(url, {method: 'get'});
-
-  //   return throwOnErrorResponse<IPagination<IProcessEntity>>(response);
-  // }
 }
