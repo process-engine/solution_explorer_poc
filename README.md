@@ -10,12 +10,15 @@ Explorer".
 ## Setup
 
 To install dependencies:
+
 `npm install`
 
 To build the project:
+
 `npm run build`
 
 To run the tests:
+
 `npm test`
 
 ## Usage
