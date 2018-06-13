@@ -7,6 +7,12 @@ The solution explorer service provides an API to load and save solutions.
 This serves as a proof of concept for the further development of the "Solution
 Explorer".
 
+## TL;DR
+
+```bash
+npm install && npm run build && npm test
+```
+
 ## Setup
 
 To install dependencies:
