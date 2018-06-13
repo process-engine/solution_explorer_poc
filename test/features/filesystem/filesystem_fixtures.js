@@ -1,7 +1,7 @@
 'use strict';
 
-const SolutionExplorerService = require('../src/SolutionExplorer.Service/ioc_module');
-const SolutionExplorerRepository = require('../src/SolutionExplorer.Repository.FileSystem/ioc_module');
+const SolutionExplorerService = require('../../../src/SolutionExplorer.Service/ioc_module');
+const SolutionExplorerRepository = require('../../../src/SolutionExplorer.Repository.FileSystem/ioc_module');
 
 const InvocationContainer = require('addict-ioc').InvocationContainer;
 
