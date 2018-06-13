@@ -40,6 +40,18 @@ describe('Solution Explorer Tests Using Filesystem', function() {
     assert.ok(success)
   });
 
+  it('Should Load a Solution; Check for Expected BPMN Files.', async () => {
+    const service = await test;
+    await service.openSolution(pathspec);
+    const solution = await service.loadSolution();
+
+    assert.equal(solution.name, "assets/solutions");
+    assert.equal(solution.uri, "assets/solutions");
+    assert.equal(solution.diagrams[0].name, "Prozesserstellen");
+    assert.equal(solution.diagrams[1].name, "script_task_test");
+    assert.equal(solution.diagrams.length, 2);
+  });
+
   it('Should Load a Diagram.', async () => {
     const service = await test;
     await service.openSolution(pathspec);

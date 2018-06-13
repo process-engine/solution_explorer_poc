@@ -12,8 +12,8 @@ export class SolutionExplorerService implements ISolutionExplorerService {
   }
 
   public async openSolution(pathspec: string): Promise<boolean> {
-    
-    /* 
+
+    /*
      * We do not assume to can handle errors correctly;
      * the repository should
      * throw HTTP-like Errors; we just care for the good path here; the Error needs to be handled above.
@@ -27,10 +27,19 @@ export class SolutionExplorerService implements ISolutionExplorerService {
 
   public async loadSolution(): Promise<ISolution> {
     const diagrams: Array<IDiagram> =  await this._repository.getDiagrams();
+
+    const pathspec = this._pathspec;
+
+    //  Cleanup name if '/' at the end {{{ //
+    //  TODO: Replace this by a proper RegEx
+    const name: string = pathspec.slice(-1)[0] === '/' ? pathspec.slice(0, -1) : pathspec;
+    const uri: string = pathspec.slice(-1)[0] === '/' ? pathspec.slice(0, -1) : pathspec;
+    //  }}} Cleanup name if '/' at the end //
+
     return {
+      name: name,
+      uri: uri,
       diagrams: diagrams,
-      name: this._pathspec,
-      uri: this._pathspec,
     };
   }
 
