@@ -1,0 +1,20 @@
+{
+  "name": "solutionexplorer.repository.processengine",
+  "version": "0.0.1",
+  "description": "",
+  "main": "dist/index.js",
+  "typings": "dist/index.d.ts",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "rm -fr dist && tsc --outdir dist --declaration"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@essential-projects/core_contracts": "^2.0.0",
+    "@process-engine/process_engine_contracts": "^9.0.0",
+    "popsicle": "^10.0.1",
+    "solutionexplorer.contracts": "0.0.1",
+    "solutionexplorer.repository.contracts": "0.0.1"
+  }
+}
