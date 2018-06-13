@@ -12,8 +12,14 @@ export class SolutionExplorerService implements ISolutionExplorerService {
   }
 
   public async openSolution(pathspec: string): Promise<boolean> {
-    const success: boolean = await this._repository.openPath(pathspec);
-    if (success) {
+    
+    /* 
+     * We do not assume to can handle errors correctly;
+     * the repository should
+     * throw HTTP-like Errors; we just care for the good path here; the Error needs to be handled above.
+     */
+    const targetAvailable: boolean = await this._repository.openPath(pathspec);
+    if (targetAvailable) {
       this._pathspec = pathspec;
     }
     return Promise.resolve(true);
