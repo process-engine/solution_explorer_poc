@@ -68,9 +68,8 @@ describe('Solution Explorer Tests Using Local Database.', function() {
        */
       const success = await service.openSolution(brokenPathSpec);
     } catch (e) {
-      e.errorCode === 404 ? assert.ok() : assert.fail();
+      assert.ok(e._code === 404);
     }
-    assert.fail();
   })
 
   it('Should Not Save a Solution With Broken URI.', async () => {

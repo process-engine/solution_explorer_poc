@@ -12,6 +12,7 @@
   "license": "ISC",
   "dependencies": {
     "@essential-projects/core_contracts": "^2.0.0",
+    "@essential-projects/errors_ts": "^1.2.0",
     "@process-engine/process_engine_contracts": "^9.0.0",
     "popsicle": "^10.0.1",
     "solutionexplorer.contracts": "0.0.1",

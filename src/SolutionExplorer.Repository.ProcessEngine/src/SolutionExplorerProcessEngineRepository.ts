@@ -3,6 +3,7 @@ import {IPagination, ISolutionExplorerRepository} from 'solutionexplorer.reposit
 import {IProcessDefEntity} from '@process-engine/process_engine_contracts';
 import {IDiagram} from 'solutionexplorer.contracts';
 import {get, post, plugins, Response, RequestOptions} from 'popsicle';
+import {NotFoundError} from '@essential-projects/errors_ts';
 
 export class SolutionExplorerProcessEngineRepository implements ISolutionExplorerRepository {
 
@@ -13,7 +14,15 @@ export class SolutionExplorerProcessEngineRepository implements ISolutionExplore
       pathspec = pathspec.substr(0, pathspec.length - 1);
     }
     this._baseUri = `${pathspec}/datastore/ProcessDef`;
-    return Promise.resolve(true);
+    try {
+      const response: Response = await get(this._baseUri);
+
+      return Promise.resolve(response.status === 200);
+
+    } catch (e) {
+      throw new NotFoundError('Solution wasnt found');
+    }
+
   }
 
   public async getDiagrams(): Promise<Array<IDiagram>> {
