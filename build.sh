@@ -1,15 +1,20 @@
+#!/bin/bash
+
+# Execute npm run build in a folder specified
+# by the first parameter; returns to the starting
+# location unsing cd's jumpstack.
 function buildPackage() {
-  cd "$1"
+  cd "${1}"
   npm run build
-  cd ".."
+  cd -
 }
 
-cd src/
-
 # build contracts first
-buildPackage "SolutionExplorer.Contracts"
-buildPackage "SolutionExplorer.Repository.Contracts"
-buildPackage "SolutionExplorer.Service.Contracts"
+buildPackage "src/SolutionExplorer.Contracts"
+buildPackage "src/SolutionExplorer.Repository.Contracts"
+buildPackage "src/SolutionExplorer.Service.Contracts"
 
-buildPackage "SolutionExplorer.Repository.ProcessEngine"
-buildPackage "SolutionExplorer.Service"
+# build implementations
+buildPackage "src/SolutionExplorer.Repository.FileSystem"
+buildPackage "src/SolutionExplorer.Repository.ProcessEngine"
+buildPackage "src/SolutionExplorer.Service"

@@ -1,6 +1,6 @@
 const assert = require('assert');
 
-const test = require('./local_database_fixtures');
+const test = require('./ProcessEngine.fixtures');
 
 /*
  * This describes tests againt a local ProcessEngine, and it's internal databse.
