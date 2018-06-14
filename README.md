@@ -13,8 +13,6 @@ Explorer".
 npm install && npm run build && npm test
 ```
 
-**Note** To run the Tests successfully you need to set up a process-engine at port 8000.
-
 ## Setup
 
 To install dependencies:
@@ -25,7 +23,11 @@ To build the project:
 
 `npm run build`
 
-To run the tests:
+Now you need to start a process-engine. To do this follow the Guide on:
+
+https://github.com/process-engine/skeleton
+
+To finally run the tests:
 
 `npm test`
 
