@@ -67,12 +67,18 @@ export class SolutionExplorerProcessEngineRepository implements ISolutionExplore
           xml: diagramToSave.xml,
       }),
     };
-    const response: Response = await post(options)
-      .use(plugins.parse(['json']));
+    try {
+      const response: Response = await post(options)
+        .use(plugins.parse(['json']));
 
-    const body: {result: boolean} = response.body;
+      const body: {result: boolean} = response.body;
 
-    return Promise.resolve(body.result);
+      return Promise.resolve(body.result);
+    } catch(e) {
+      //This needs another Error
+      throw new NotFoundError('Not able to save diagram')
+    }
+
   }
 
   private _mapProcessDefToDiagram = (processDef: IProcessDefEntity): IDiagram => {

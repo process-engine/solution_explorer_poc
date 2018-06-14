@@ -62,10 +62,6 @@ describe('Solution Explorer Tests Using Local Database.', function() {
   it('Should Raise an NotFound Error While Opening a Solution.', async () => {
     const service = await test;
     try {
-      /*
-       * Currently the implementation of openSolution() will always
-       * return true; this behaviour is wrong.
-       */
       const success = await service.openSolution(brokenPathSpec);
     } catch (e) {
       assert.ok(e._code === 404);
@@ -80,6 +76,10 @@ describe('Solution Explorer Tests Using Local Database.', function() {
     await service.openSolution(pathspec);
     const solution = await service.loadSolution();
     solution.uri = brokenPathSpec;
+    /**
+     * The savediagram method is used to save all diagrams but not the solution itself (name and uri).
+     * This is the wrong behaviour.
+     */
     const saveNotSuccessfull = !await service.saveSolution(solution);
     assert.ok(saveNotSuccessfull)
   });
@@ -92,6 +92,10 @@ describe('Solution Explorer Tests Using Local Database.', function() {
     const service = await test;
     await service.openSolution(pathspec);
     const solution = await service.loadSolution();
+    /**
+     * The function saveSolution doesn't use its second parameter right now.
+     * Need to be implemented.
+     */
     const unableToSaveSulution = !await service.saveSolution(solution, brokenPathSpec);
     assert.ok(unableToSaveSulution)
   });
@@ -103,8 +107,12 @@ describe('Solution Explorer Tests Using Local Database.', function() {
     const diagram = await service.loadDiagram(solution.diagrams[0].name);
     diagram.uri = brokenPathSpec;
     // boom
-    const success = await service.saveDiagram(diagram);
-    assert.ok(success);
+    try {
+      const success = await service.saveDiagram(diagram);
+    } catch(e) {
+      assert.ok(e._code === 404);
+    }
+
   })
   // }}} Bad Case Tests //
 })
