@@ -1,4 +1,5 @@
 import {ISolutionExplorerRepository} from 'solutionexplorer.repository.contracts';
+import {NotFoundError} from '@essential-projects/errors_ts';
 import {IDiagram} from 'solutionexplorer.contracts';
 import * as fs from 'fs-extra';
 import * as path from 'path';
@@ -10,6 +11,12 @@ export class SolutionExplorerFileSystemRepository implements ISolutionExplorerRe
   private _basePath: string;
 
   public async openPath(pathspec: string): Promise<boolean> {
+    const pathExists: boolean = await fs.pathExists(pathspec);
+
+    if (!pathExists) {
+      throw new NotFoundError(`'${pathspec}' does not exist.`);
+    }
+
     const stat: fs.Stats = await fs.stat(pathspec);
 
     const directoryExists: boolean = stat.isDirectory();
@@ -17,7 +24,7 @@ export class SolutionExplorerFileSystemRepository implements ISolutionExplorerRe
       this._basePath = pathspec;
     }
 
-    return Promise.resolve(directoryExists);
+    return directoryExists;
   }
 
   public async getDiagrams(): Promise<Array<IDiagram>> {
@@ -72,6 +79,6 @@ export class SolutionExplorerFileSystemRepository implements ISolutionExplorerRe
 
     await fs.writeFile(fullPathToFile, diagramToSave.xml);
 
-    return Promise.resolve(true);
+    return true;
   }
 }

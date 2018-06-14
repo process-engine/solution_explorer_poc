@@ -80,7 +80,8 @@ describe('Solution Explorer Tests Using Filesystem', function() {
        */
       const success = await service.openSolution(brokenPathSpec);
     } catch (e) {
-      e.errorCode === 404 ? assert.ok() : assert.fail();
+      console.log(e);
+      e.code === 404 ? assert.ok() : assert.fail();
     }
     assert.fail();
   })

@@ -12,7 +12,6 @@ export class SolutionExplorerService implements ISolutionExplorerService {
   }
 
   public async openSolution(pathspec: string): Promise<boolean> {
-
     /*
      * We do not assume to can handle errors correctly;
      * the repository should
