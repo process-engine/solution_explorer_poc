@@ -13,6 +13,8 @@ Explorer".
 npm install && npm run build && npm test
 ```
 
+**Note** To run the Tests successfully you need to set up a process-engine at port 8000.
+
 ## Setup
 
 To install dependencies:
