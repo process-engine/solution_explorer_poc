@@ -11,9 +11,9 @@ export class SolutionExplorerFileSystemRepository implements ISolutionExplorerRe
   private _basePath: string;
 
   public async openPath(pathspec: string): Promise<boolean> {
-    const pathExists: boolean = await fs.pathExists(pathspec);
+    const pathDoesNotExist: boolean = !await fs.pathExists(pathspec);
 
-    if (!pathExists) {
+    if (pathDoesNotExist) {
       throw new NotFoundError(`'${pathspec}' does not exist.`);
     }
 
@@ -89,7 +89,9 @@ export class SolutionExplorerFileSystemRepository implements ISolutionExplorerRe
   }
 
   public async saveSolution(solution: ISolution, path?: string): Promise<boolean> {
-    if (path !== undefined && path !== null) {
+    const newPathWasSet: boolean = path !== undefined && path !== null;
+
+    if (newPathWasSet) {
       await this.openPath(path);
     }
 
