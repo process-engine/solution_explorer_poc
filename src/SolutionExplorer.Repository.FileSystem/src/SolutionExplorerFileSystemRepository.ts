@@ -1,5 +1,5 @@
 import {ISolutionExplorerRepository} from 'solutionexplorer.repository.contracts';
-import {NotFoundError} from '@essential-projects/errors_ts';
+import {BadRequestError, NotFoundError} from '@essential-projects/errors_ts';
 import {IDiagram, ISolution} from 'solutionexplorer.contracts';
 import * as fs from 'fs-extra';
 import * as path from 'path';
@@ -77,7 +77,13 @@ export class SolutionExplorerFileSystemRepository implements ISolutionExplorerRe
   public async saveDiagram(diagramToSave: IDiagram): Promise<boolean> {
     const fullPathToFile: string = path.join(this._basePath, `${diagramToSave.name}.bpmn`);
 
-    await fs.writeFile(fullPathToFile, diagramToSave.xml);
+    try {
+      await fs.writeFile(fullPathToFile, diagramToSave.xml);
+    } catch (e) {
+      const error: BadRequestError = new BadRequestError('asd');
+      error.additionalInformation = e;
+      throw error;
+    }
 
     return true;
   }
