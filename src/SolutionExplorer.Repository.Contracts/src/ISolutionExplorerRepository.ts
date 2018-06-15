@@ -9,5 +9,5 @@ export interface ISolutionExplorerRepository {
 
   getDiagramByName(diagramName: string): Promise<IDiagram>;
 
-  saveSolution(solution: ISolution): Promise<boolean>;
+  saveSolution(solution: ISolution, pathspec?: string): Promise<boolean>;
 }

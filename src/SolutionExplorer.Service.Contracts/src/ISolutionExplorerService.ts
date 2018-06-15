@@ -39,9 +39,9 @@ export interface ISolutionExplorerService {
    * Save a single diagram.
    *
    * @param diagram The diagram to save.
-   * @param path The target path for the save operation, defaults to the source
+   * @param pathspec The target path for the save operation, defaults to the source
    *             of the diagram if omitted.
    * @returns A promise, resolving to true if the operation was successfull.
    */
-  saveDiagram(diagram: IDiagram, path?: string): Promise<boolean>;
+  saveDiagram(diagram: IDiagram, pathspec?: string): Promise<boolean>;
 }
