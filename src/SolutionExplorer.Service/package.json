@@ -11,6 +11,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@essential-projects/core_contracts": "^2.0.0",
     "@essential-projects/errors_ts": "^1.2.0",
     "solutionexplorer.contracts": "0.0.1",
     "solutionexplorer.repository.contracts": "0.0.1",

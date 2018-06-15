@@ -1,5 +1,6 @@
 import {ISolutionExplorerRepository} from 'solutionexplorer.repository.contracts';
 import {BadRequestError, NotFoundError} from '@essential-projects/errors_ts';
+import {IIdentity} from '@essential-projects/core_contracts';
 import {IDiagram, ISolution} from 'solutionexplorer.contracts';
 import * as fs from 'fs-extra';
 import * as path from 'path';
@@ -9,22 +10,26 @@ const BPMN_FILE_SUFFIX: string = '.bpmn';
 export class SolutionExplorerFileSystemRepository implements ISolutionExplorerRepository {
 
   private _basePath: string;
+  private _identity: IIdentity;
 
-  public async openPath(pathspec: string): Promise<boolean> {
-    const pathDoesNotExist: boolean = !await fs.pathExists(pathspec);
-
+  private async _checkForDirectory(directoryPath: string): Promise<void> {
+    const pathDoesNotExist: boolean = !await fs.pathExists(directoryPath);
     if (pathDoesNotExist) {
-      throw new NotFoundError(`'${pathspec}' does not exist.`);
+      throw new NotFoundError(`'${directoryPath}' does not exist.`);
     }
 
-    const stat: fs.Stats = await fs.stat(pathspec);
-
-    const directoryExists: boolean = stat.isDirectory();
-    if (directoryExists) {
-      this._basePath = pathspec;
+    const stat: fs.Stats = await fs.stat(directoryPath);
+    const isNotDirectory: boolean = !stat.isDirectory();
+    if (isNotDirectory) {
+      throw new NotFoundError(`'${directoryPath}' is not an directory.`);
     }
+  }
 
-    return directoryExists;
+  public async openPath(pathspec: string, identity: IIdentity): Promise<void> {
+    await this._checkForDirectory(pathspec);
+
+    this._basePath = pathspec;
+    this._identity = identity;
   }
 
   public async getDiagrams(): Promise<Array<IDiagram>> {
@@ -74,8 +79,18 @@ export class SolutionExplorerFileSystemRepository implements ISolutionExplorerRe
     return diagram;
   }
 
-  public async saveDiagram(diagramToSave: IDiagram): Promise<boolean> {
+  // check path before check
+  // interface doc override
+  public async saveDiagram(diagramToSave: IDiagram): Promise<void> {
     const fullPathToFile: string = path.join(this._basePath, `${diagramToSave.name}.bpmn`);
+
+    const uriOfDiagramWasChanged: boolean = fullPathToFile !== diagramToSave.uri;
+
+    if (uriOfDiagramWasChanged) {
+      throw new BadRequestError(`Uri of diagram was changed.`);
+    }
+
+    await this._checkForDirectory(this._basePath);
 
     try {
       await fs.writeFile(fullPathToFile, diagramToSave.xml);
@@ -84,23 +99,19 @@ export class SolutionExplorerFileSystemRepository implements ISolutionExplorerRe
       error.additionalInformation = e;
       throw error;
     }
-
-    return true;
   }
 
-  public async saveSolution(solution: ISolution, path?: string): Promise<boolean> {
+  public async saveSolution(solution: ISolution, path?: string): Promise<void> {
     const newPathWasSet: boolean = path !== undefined && path !== null;
 
     if (newPathWasSet) {
-      await this.openPath(path);
+      await this.openPath(path, this._identity);
     }
 
-    const promises: Array<Promise<boolean>> = solution.diagrams.map((diagram: IDiagram) => {
+    const promises: Array<Promise<void>> = solution.diagrams.map((diagram: IDiagram) => {
       return this.saveDiagram(diagram);
     });
 
     await Promise.all(promises);
-
-    return true;
   }
 }

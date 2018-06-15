@@ -1,4 +1,5 @@
 import {ISolution, IDiagram} from 'solutionexplorer.contracts';
+import {IIdentity} from '@essential-projects/core_contracts';
 
 export interface ISolutionExplorerService {
 
@@ -6,9 +7,10 @@ export interface ISolutionExplorerService {
    * Prepares the solution explorer service to load a given path specification.
    *
    * @param pathspec The path specification to load.
+   * @param identity The identity that is used to authorize, currently unused.
    * @returns A promise, resolving to true if the operation was successfull.
    */
-  openSolution(pathspec: string): Promise<boolean>;
+  openSolution(pathspec: string, identity: IIdentity): Promise<void>;
 
   /**
    * Loads the solution, its required to call openSolution() first.
@@ -25,7 +27,7 @@ export interface ISolutionExplorerService {
    *             of the solution if omitted.
    * @returns A promise, resolving to true if the operation was successfull.
    */
-  saveSolution(solution: ISolution, path?: string): Promise<boolean>;
+  saveSolution(solution: ISolution, path?: string): Promise<void>;
 
   /**
    * Loads a single diagram from a solution.
@@ -43,5 +45,5 @@ export interface ISolutionExplorerService {
    *             of the diagram if omitted.
    * @returns A promise, resolving to true if the operation was successfull.
    */
-  saveDiagram(diagram: IDiagram, pathspec?: string): Promise<boolean>;
+  saveDiagram(diagram: IDiagram, pathspec?: string): Promise<void>;
 }

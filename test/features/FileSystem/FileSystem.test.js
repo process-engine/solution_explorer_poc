@@ -14,7 +14,6 @@ describe('Solution Explorer Tests Using Filesystem', function() {
   it('Should Open a Solution.', async () => {
     const service = await test;
     const success = await service.openSolution(pathspec);
-    assert.ok(success);
   })
 
   it('Should Load a Solution.', async () => {
@@ -29,7 +28,6 @@ describe('Solution Explorer Tests Using Filesystem', function() {
     await service.openSolution(pathspec);
     const solution = await service.loadSolution();
     const success = await service.saveSolution(solution);
-    assert.ok(success)
   });
 
   it(`Should Save a Solution to Location '${pathspec}'.`, async () => {
@@ -37,7 +35,6 @@ describe('Solution Explorer Tests Using Filesystem', function() {
     await service.openSolution(pathspec);
     const solution = await service.loadSolution();
     const success = await service.saveSolution(solution, pathspec);
-    assert.ok(success)
   });
 
   it('Should Load a Solution; Check for Expected BPMN Files.', async () => {
@@ -66,7 +63,6 @@ describe('Solution Explorer Tests Using Filesystem', function() {
     const solution = await service.loadSolution();
     const diagram = await service.loadDiagram(solution.diagrams[0].name);
     const success = await service.saveDiagram(diagram);
-    assert.ok(success);
   })
   // }}} Good Case Tests //
 
@@ -74,9 +70,9 @@ describe('Solution Explorer Tests Using Filesystem', function() {
   it('Should Raise an NotFound Error While Opening a Solution.', async () => {
     const service = await test;
     try {
-      const success = await service.openSolution(brokenPathSpec);
-    } catch (e) {
-      assert.ok(e.code === 404);
+      await service.openSolution(brokenPathSpec);
+    } catch (error) {
+      assert.equal(error.code, 404);
     }
   });
 
@@ -91,8 +87,8 @@ describe('Solution Explorer Tests Using Filesystem', function() {
 
     try {
       await service.saveSolution(solution);
-    } catch (e) {
-      assert.ok(e.code === 404);
+    } catch (error) {
+      assert.equal(error.code, 400);
     }
   });
 
@@ -107,8 +103,8 @@ describe('Solution Explorer Tests Using Filesystem', function() {
 
     try {
       await service.saveSolution(solution, brokenPathSpec);
-    } catch (e) {
-      assert.ok(e.code === 404);
+    } catch (error) {
+      assert.equal(error.code, 404);
     }
   });
 
@@ -117,10 +113,13 @@ describe('Solution Explorer Tests Using Filesystem', function() {
     await service.openSolution(pathspec);
     const solution = await service.loadSolution();
     const diagram = await service.loadDiagram(solution.diagrams[0].name);
-    diagram.uri = brokenPathSpec;
     // boom
-    const success = await service.saveDiagram(diagram);
-    assert.ok(success);
+    diagram.uri = brokenPathSpec;
+    try {
+      await service.saveDiagram(diagram);
+    } catch (error) {
+      assert.equal(error.code, 400);
+    }
   })
   // }}} Bad Case Tests //
 })
