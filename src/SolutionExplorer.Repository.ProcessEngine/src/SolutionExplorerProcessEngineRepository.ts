@@ -1,28 +1,35 @@
-import {IQueryClause} from '@essential-projects/core_contracts';
+import {IQueryClause, IIdentity} from '@essential-projects/core_contracts';
 import {IPagination, ISolutionExplorerRepository} from 'solutionexplorer.repository.contracts';
 import {IProcessDefEntity} from '@process-engine/process_engine_contracts';
-import {IDiagram} from 'solutionexplorer.contracts';
+import {IDiagram, ISolution} from 'solutionexplorer.contracts';
 import {get, post, plugins, Response, RequestOptions} from 'popsicle';
-import {NotFoundError} from '@essential-projects/errors_ts';
+import {NotFoundError, InternalServerError} from '@essential-projects/errors_ts';
 
 export class SolutionExplorerProcessEngineRepository implements ISolutionExplorerRepository {
 
   private _baseUri: string;
+  private _identity: IIdentity;
 
-  public async openPath(pathspec: string): Promise<boolean> {
+  public async openPath(pathspec: string, identity: IIdentity): Promise<void> {
     if (pathspec.endsWith('/')) {
       pathspec = pathspec.substr(0, pathspec.length - 1);
     }
-    this._baseUri = `${pathspec}/datastore/ProcessDef`;
+    const baseUri: string = `${pathspec}/datastore/ProcessDef`;
+
+    let response: Response;
     try {
-      const response: Response = await get(this._baseUri);
-
-      return Promise.resolve(response.status === 200);
-
+      response = await get(baseUri);
     } catch (e) {
-      throw new NotFoundError('Solution wasnt found');
+      throw new NotFoundError('Datastore not reachable');
     }
 
+    const statusWasNotOk = response.status !== 200;
+    if (statusWasNotOk) {
+      throw new NotFoundError('Solution was not found');
+    }
+
+    this._baseUri = baseUri;
+    this._identity = identity;
   }
 
   public async getDiagrams(): Promise<Array<IDiagram>> {
@@ -57,7 +64,15 @@ export class SolutionExplorerProcessEngineRepository implements ISolutionExplore
     return diagrams;
   }
 
-  public async saveDiagram(diagramToSave: IDiagram): Promise<boolean> {
+  public async saveSolution(solution: ISolution, pathspec?: string): Promise<void> {
+    const promises: Array<Promise<void>> = solution.diagrams.map((diagram: IDiagram) => {
+      return this.saveDiagram(diagram);
+    });
+
+    await Promise.all(promises);
+  }
+
+  public async saveDiagram(diagramToSave: IDiagram, pathspec?: string): Promise<void> {
     const options: RequestOptions = {
       url: `${diagramToSave.uri}/updateBpmn`,
       headers: {
@@ -67,18 +82,21 @@ export class SolutionExplorerProcessEngineRepository implements ISolutionExplore
           xml: diagramToSave.xml,
       }),
     };
+
+    let response: Response;
     try {
-      const response: Response = await post(options)
+      response = await post(options)
         .use(plugins.parse(['json']));
-
-      const body: {result: boolean} = response.body;
-
-      return Promise.resolve(body.result);
     } catch(e) {
-      //This needs another Error
-      throw new NotFoundError('Not able to save diagram')
+      throw new NotFoundError('Datastore not reachable');
     }
 
+    const body: {result: boolean} = response.body;
+    const saveNotSucessfull: boolean = body.result === false;
+
+    if (saveNotSucessfull) {
+      throw new InternalServerError('Diagram could not be saved');
+    }
   }
 
   private _mapProcessDefToDiagram = (processDef: IProcessDefEntity): IDiagram => {
