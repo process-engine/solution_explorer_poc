@@ -3,12 +3,12 @@ const assert = require('assert');
 const test = require('./FileSystem.fixtures');
 
 /*
- * This describes tests againt a local ProcessEngine, and it's internal databse.
+ * This describes tests against a local filesystem.
  */
 describe('Solution Explorer Tests Using Filesystem', function() {
 
   const pathspec = 'assets/solutions/';
-  const brokenPathSpec = 'unknown';
+  const brokenPathSpec = 'this_will_not_work';
 
   // Good Case Tests {{{ //
   it('Should Open a Solution.', async () => {
