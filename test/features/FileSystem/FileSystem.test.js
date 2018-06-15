@@ -13,7 +13,7 @@ describe('Solution Explorer Tests Using Filesystem', function() {
   // Good Case Tests {{{ //
   it('Should Open a Solution.', async () => {
     const service = await test;
-    const success = await service.openSolution(pathspec);
+    await service.openSolution(pathspec);
   })
 
   it('Should Load a Solution.', async () => {
@@ -27,14 +27,14 @@ describe('Solution Explorer Tests Using Filesystem', function() {
     const service = await test;
     await service.openSolution(pathspec);
     const solution = await service.loadSolution();
-    const success = await service.saveSolution(solution);
+    await service.saveSolution(solution);
   });
 
   it(`Should Save a Solution to Location '${pathspec}'.`, async () => {
     const service = await test;
     await service.openSolution(pathspec);
     const solution = await service.loadSolution();
-    const success = await service.saveSolution(solution, pathspec);
+    await service.saveSolution(solution, pathspec);
   });
 
   it('Should Load a Solution; Check for Expected BPMN Files.', async () => {
@@ -62,7 +62,7 @@ describe('Solution Explorer Tests Using Filesystem', function() {
     await service.openSolution(pathspec);
     const solution = await service.loadSolution();
     const diagram = await service.loadDiagram(solution.diagrams[0].name);
-    const success = await service.saveDiagram(diagram);
+    await service.saveDiagram(diagram);
   })
   // }}} Good Case Tests //
 
