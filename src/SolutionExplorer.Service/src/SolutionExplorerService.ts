@@ -1,6 +1,8 @@
 import {ISolutionExplorerService} from 'solutionexplorer.service.contracts';
 import {ISolution, IDiagram} from 'solutionexplorer.contracts';
 import {ISolutionExplorerRepository} from 'solutionexplorer.repository.contracts';
+import {IIdentity} from '@essential-projects/core_contracts';
+import {BadRequestError} from '@essential-projects/errors_ts';
 
 export class SolutionExplorerService implements ISolutionExplorerService {
 
@@ -11,18 +13,15 @@ export class SolutionExplorerService implements ISolutionExplorerService {
     this._repository = repository;
   }
 
-  public async openSolution(pathspec: string): Promise<boolean> {
+  public async openSolution(pathspec: string, identity: IIdentity): Promise<void> {
+    //  Cleanup name if '/' at the end {{{ //
+    //  TODO: Replace this by a proper RegEx
+    const slicedPathspec: string = pathspec.slice(-1)[0] === '/' ? pathspec.slice(0, -1) : pathspec;
+    //  }}} Cleanup name if '/' at the end //<
 
-    /*
-     * We do not assume to can handle errors correctly;
-     * the repository should
-     * throw HTTP-like Errors; we just care for the good path here; the Error needs to be handled above.
-     */
-    const targetAvailable: boolean = await this._repository.openPath(pathspec);
-    if (targetAvailable) {
-      this._pathspec = pathspec;
-    }
-    return Promise.resolve(true);
+    await this._repository.openPath(slicedPathspec, identity);
+
+    this._pathspec = slicedPathspec;
   }
 
   public async loadSolution(): Promise<ISolution> {
@@ -30,11 +29,8 @@ export class SolutionExplorerService implements ISolutionExplorerService {
 
     const pathspec = this._pathspec;
 
-    //  Cleanup name if '/' at the end {{{ //
-    //  TODO: Replace this by a proper RegEx
-    const name: string = pathspec.slice(-1)[0] === '/' ? pathspec.slice(0, -1) : pathspec;
-    const uri: string = pathspec.slice(-1)[0] === '/' ? pathspec.slice(0, -1) : pathspec;
-    //  }}} Cleanup name if '/' at the end //
+    const name: string = pathspec;
+    const uri: string = pathspec;
 
     return {
       name: name,
@@ -43,20 +39,21 @@ export class SolutionExplorerService implements ISolutionExplorerService {
     };
   }
 
-  public async saveSolution(solution: ISolution): Promise<boolean> {
-    const promises: Array<Promise<boolean>> = solution.diagrams.map((diagram: IDiagram) => {
-      return this.saveDiagram(diagram);
-    });
-    await Promise.all(promises);
+  public async saveSolution(solution: ISolution, path?: string): Promise<void> {
+    const solutionPathDosentMatchCurrentPathSpec: boolean = solution.uri !== this._pathspec;
 
-    return Promise.resolve(true);
+    if (solutionPathDosentMatchCurrentPathSpec) {
+      throw new BadRequestError(`'${solution.uri}' dosent match opened pathspec '${this._pathspec}'.`);
+    }
+
+    await this._repository.saveSolution(solution, path);
   }
 
   public loadDiagram(diagramName: string): Promise<IDiagram> {
     return this._repository.getDiagramByName(diagramName);
   }
 
-  public saveDiagram(diagram: IDiagram): Promise<boolean> {
-    return this._repository.saveDiagram(diagram);
+  public saveDiagram(diagram: IDiagram, pathspec?: string): Promise<void> {
+    return this._repository.saveDiagram(diagram, pathspec);
   }
 }

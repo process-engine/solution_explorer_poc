@@ -1,4 +1,5 @@
 import {ISolution, IDiagram} from 'solutionexplorer.contracts';
+import {IIdentity} from '@essential-projects/core_contracts';
 
 export interface ISolutionExplorerService {
 
@@ -6,9 +7,9 @@ export interface ISolutionExplorerService {
    * Prepares the solution explorer service to load a given path specification.
    *
    * @param pathspec The path specification to load.
-   * @returns A promise, resolving to true if the operation was successfull.
+   * @param identity The identity that is used to authorize, currently unused.
    */
-  openSolution(pathspec: string): Promise<boolean>;
+  openSolution(pathspec: string, identity: IIdentity): Promise<void>;
 
   /**
    * Loads the solution, its required to call openSolution() first.
@@ -18,17 +19,7 @@ export interface ISolutionExplorerService {
   loadSolution(): Promise<ISolution>;
 
   /**
-   * Saves the given solution and all its diagrams.
-   *
-   * @param solution The solution to save.
-   * @param path The target path for the save operation, defaults to the source
-   *             of the solution if omitted.
-   * @returns A promise, resolving to true if the operation was successfull.
-   */
-  saveSolution(solution: ISolution, path?: string): Promise<boolean>;
-
-  /**
-   * Loads a single diagram from a solution.
+   * Loads a single diagram from the current solution.
    *
    * @param diagramName The name of the diagram to load.
    * @returns A promise, resolving to the loaded diagram.
@@ -36,12 +27,22 @@ export interface ISolutionExplorerService {
   loadDiagram(diagramName: string): Promise<IDiagram>;
 
   /**
-   * Save a single diagram.
+   * Saves the given solution and all its diagrams. If a solution already
+   * exists, it will be overriden. This method does not modify the currently
+   * loaded pathspec.
+   *
+   * @param solution The solution to save.
+   * @param pathspec The target path for the save operation, defaults to the source
+   *                 of the solution if omitted.
+   */
+  saveSolution(solution: ISolution, pathspec?: string): Promise<void>;
+
+  /**
+   * Save a single diagram, if a diagram already exists, it will be overriden.
    *
    * @param diagram The diagram to save.
-   * @param path The target path for the save operation, defaults to the source
-   *             of the diagram if omitted.
-   * @returns A promise, resolving to true if the operation was successfull.
+   * @param pathspec The target path for the save operation, defaults to the source
+   *                 of the diagram if omitted.
    */
-  saveDiagram(diagram: IDiagram, path?: string): Promise<boolean>;
+  saveDiagram(diagram: IDiagram, pathspec?: string): Promise<void>;
 }
