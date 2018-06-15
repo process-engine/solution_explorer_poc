@@ -12,25 +12,6 @@ export class SolutionExplorerFileSystemRepository implements ISolutionExplorerRe
   private _basePath: string;
   private _identity: IIdentity;
 
-  private async _checkForDirectory(directoryPath: string): Promise<void> {
-    const pathDoesNotExist: boolean = !await fs.pathExists(directoryPath);
-    if (pathDoesNotExist) {
-      throw new NotFoundError(`'${directoryPath}' does not exist.`);
-    }
-
-    const stat: fs.Stats = await fs.stat(directoryPath);
-    const isNotDirectory: boolean = !stat.isDirectory();
-    if (isNotDirectory) {
-      throw new NotFoundError(`'${directoryPath}' is not an directory.`);
-    }
-  }
-
-  private async _checkWriteablity(filePath: string): Promise<void> {
-    const directoryPath: string = path.dirname(filePath);
-
-    await this._checkForDirectory(directoryPath);
-  }
-
   public async openPath(pathspec: string, identity: IIdentity): Promise<void> {
     await this._checkForDirectory(pathspec);
 
@@ -127,5 +108,24 @@ export class SolutionExplorerFileSystemRepository implements ISolutionExplorerRe
     });
 
     await Promise.all(promises);
+  }
+
+  private async _checkForDirectory(directoryPath: string): Promise<void> {
+    const pathDoesNotExist: boolean = !await fs.pathExists(directoryPath);
+    if (pathDoesNotExist) {
+      throw new NotFoundError(`'${directoryPath}' does not exist.`);
+    }
+
+    const stat: fs.Stats = await fs.stat(directoryPath);
+    const isNotDirectory: boolean = !stat.isDirectory();
+    if (isNotDirectory) {
+      throw new NotFoundError(`'${directoryPath}' is not an directory.`);
+    }
+  }
+
+  private async _checkWriteablity(filePath: string): Promise<void> {
+    const directoryPath: string = path.dirname(filePath);
+
+    await this._checkForDirectory(directoryPath);
   }
 }
