@@ -53,7 +53,7 @@ export class SolutionExplorerService implements ISolutionExplorerService {
     return this._repository.getDiagramByName(diagramName);
   }
 
-  public saveDiagram(diagram: IDiagram): Promise<void> {
-    return this._repository.saveDiagram(diagram);
+  public saveDiagram(diagram: IDiagram, pathspec?: string): Promise<void> {
+    return this._repository.saveDiagram(diagram, pathspec);
   }
 }
