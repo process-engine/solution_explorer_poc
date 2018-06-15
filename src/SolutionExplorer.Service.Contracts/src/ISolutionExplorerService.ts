@@ -8,7 +8,6 @@ export interface ISolutionExplorerService {
    *
    * @param pathspec The path specification to load.
    * @param identity The identity that is used to authorize, currently unused.
-   * @returns A promise, resolving to true if the operation was successfull.
    */
   openSolution(pathspec: string, identity: IIdentity): Promise<void>;
 
@@ -20,17 +19,7 @@ export interface ISolutionExplorerService {
   loadSolution(): Promise<ISolution>;
 
   /**
-   * Saves the given solution and all its diagrams.
-   *
-   * @param solution The solution to save.
-   * @param path The target path for the save operation, defaults to the source
-   *             of the solution if omitted.
-   * @returns A promise, resolving to true if the operation was successfull.
-   */
-  saveSolution(solution: ISolution, path?: string): Promise<void>;
-
-  /**
-   * Loads a single diagram from a solution.
+   * Loads a single diagram from the current solution.
    *
    * @param diagramName The name of the diagram to load.
    * @returns A promise, resolving to the loaded diagram.
@@ -38,12 +27,22 @@ export interface ISolutionExplorerService {
   loadDiagram(diagramName: string): Promise<IDiagram>;
 
   /**
-   * Save a single diagram.
+   * Saves the given solution and all its diagrams. If a solution already
+   * exists, it will be overriden. This method does not modify the currently
+   * loaded pathspec.
+   *
+   * @param solution The solution to save.
+   * @param pathspec The target path for the save operation, defaults to the source
+   *                 of the solution if omitted.
+   */
+  saveSolution(solution: ISolution, pathspec?: string): Promise<void>;
+
+  /**
+   * Save a single diagram, if a diagram already exists, it will be overriden.
    *
    * @param diagram The diagram to save.
    * @param pathspec The target path for the save operation, defaults to the source
-   *             of the diagram if omitted.
-   * @returns A promise, resolving to true if the operation was successfull.
+   *                 of the diagram if omitted.
    */
   saveDiagram(diagram: IDiagram, pathspec?: string): Promise<void>;
 }
