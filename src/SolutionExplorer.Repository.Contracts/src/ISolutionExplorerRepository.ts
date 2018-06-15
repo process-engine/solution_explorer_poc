@@ -28,8 +28,8 @@ export interface ISolutionExplorerRepository {
   getDiagramByName(diagramName: string): Promise<IDiagram>;
 
   /**
-   * Saves the solution to the given pathspec. This method will override any
-   * existing files.
+   * Saves the given solution and all its diagrams. If a solution already
+   * exists, it will be overriden.
    *
    * @param solution The solution to save.
    * @param pathspec The target pathspec.
@@ -37,11 +37,11 @@ export interface ISolutionExplorerRepository {
   saveSolution(solution: ISolution, pathspec?: string): Promise<void>;
 
   /**
-   * Save a single diagram. This method will override any existing files.
+   * Save a single diagram, if a diagram already exists, it will be overriden.
    *
    * @param diagram The diagram to save.
    * @param pathspec The target path for the save operation, defaults to the source
    *             of the diagram if omitted.
    */
-  saveDiagram(diagramToSave: IDiagram, pathspec: string): Promise<void>;
+  saveDiagram(diagramToSave: IDiagram, pathspec?: string): Promise<void>;
 }
