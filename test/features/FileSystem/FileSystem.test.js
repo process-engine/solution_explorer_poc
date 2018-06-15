@@ -73,7 +73,9 @@ describe('Solution Explorer Tests Using Filesystem', function() {
       await service.openSolution(brokenPathSpec);
     } catch (error) {
       assert.equal(error.code, 404);
+      return;
     }
+    assert.fail('Error was not thrown.');
   });
 
   it('Should Not Save a Solution With Broken URI.', async () => {
@@ -89,7 +91,9 @@ describe('Solution Explorer Tests Using Filesystem', function() {
       await service.saveSolution(solution);
     } catch (error) {
       assert.equal(error.code, 400);
+      return;
     }
+    assert.fail('Error was not thrown.');
   });
 
   it(`Should Not Save a Solution to Broken Location '${brokenPathSpec}'.`, async () => {
@@ -105,7 +109,9 @@ describe('Solution Explorer Tests Using Filesystem', function() {
       await service.saveSolution(solution, brokenPathSpec);
     } catch (error) {
       assert.equal(error.code, 404);
+      return;
     }
+    assert.fail('Error was not thrown.');
   });
 
   it('Should Not Save a Diagram, due to Wrong Diagram URI.', async () => {
@@ -119,7 +125,9 @@ describe('Solution Explorer Tests Using Filesystem', function() {
       await service.saveDiagram(diagram);
     } catch (error) {
       assert.equal(error.code, 400);
+      return;
     }
+    assert.fail('Error was not thrown.');
   })
   // }}} Bad Case Tests //
 })
