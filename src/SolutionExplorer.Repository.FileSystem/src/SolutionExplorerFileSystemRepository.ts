@@ -84,11 +84,7 @@ export class SolutionExplorerFileSystemRepository implements ISolutionExplorerRe
 
   public async saveSolution(solution: ISolution, path?: string): Promise<boolean> {
     if (path !== undefined && path !== null) {
-      try {
-        await this.openPath(path);
-      } catch (e) {
-        return false;
-      }
+      await this.openPath(path);
     }
 
     const promises: Array<Promise<boolean>> = solution.diagrams.map((diagram: IDiagram) => {

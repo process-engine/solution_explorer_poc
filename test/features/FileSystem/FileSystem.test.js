@@ -74,10 +74,6 @@ describe('Solution Explorer Tests Using Filesystem', function() {
   it('Should Raise an NotFound Error While Opening a Solution.', async () => {
     const service = await test;
     try {
-      /*
-       * Currently the implementation of openSolution() will always
-       * return true; this behaviour is wrong.
-       */
       const success = await service.openSolution(brokenPathSpec);
     } catch (e) {
       assert.ok(e.code === 404);
@@ -92,8 +88,12 @@ describe('Solution Explorer Tests Using Filesystem', function() {
     await service.openSolution(pathspec);
     const solution = await service.loadSolution();
     solution.uri = brokenPathSpec;
-    const saveNotSuccessfull = !await service.saveSolution(solution);
-    assert.ok(saveNotSuccessfull);
+
+    try {
+      await service.saveSolution(solution);
+    } catch (e) {
+      assert.ok(e.code === 404);
+    }
   });
 
   it(`Should Not Save a Solution to Broken Location '${brokenPathSpec}'.`, async () => {
@@ -104,8 +104,12 @@ describe('Solution Explorer Tests Using Filesystem', function() {
     const service = await test;
     await service.openSolution(pathspec);
     const solution = await service.loadSolution();
-    const unableToSaveSulution = !await service.saveSolution(solution, brokenPathSpec);
-    assert.ok(unableToSaveSulution)
+
+    try {
+      await service.saveSolution(solution, brokenPathSpec);
+    } catch (e) {
+      assert.ok(e.code === 404);
+    }
   });
 
   it('Should Not Save a Diagram, due to Wrong Diagram URI.', async () => {
