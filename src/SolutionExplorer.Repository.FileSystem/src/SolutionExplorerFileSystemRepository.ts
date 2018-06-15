@@ -1,6 +1,6 @@
 import {ISolutionExplorerRepository} from 'solutionexplorer.repository.contracts';
 import {NotFoundError} from '@essential-projects/errors_ts';
-import {IDiagram} from 'solutionexplorer.contracts';
+import {IDiagram, ISolution} from 'solutionexplorer.contracts';
 import * as fs from 'fs-extra';
 import * as path from 'path';
 
@@ -78,6 +78,24 @@ export class SolutionExplorerFileSystemRepository implements ISolutionExplorerRe
     const fullPathToFile: string = path.join(this._basePath, `${diagramToSave.name}.bpmn`);
 
     await fs.writeFile(fullPathToFile, diagramToSave.xml);
+
+    return true;
+  }
+
+  public async saveSolution(solution: ISolution, path?: string): Promise<boolean> {
+    if (path !== undefined && path !== null) {
+      try {
+        await this.openPath(path);
+      } catch (e) {
+        return false;
+      }
+    }
+
+    const promises: Array<Promise<boolean>> = solution.diagrams.map((diagram: IDiagram) => {
+      return this.saveDiagram(diagram);
+    });
+
+    await Promise.all(promises);
 
     return true;
   }

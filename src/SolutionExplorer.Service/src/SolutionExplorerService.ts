@@ -1,6 +1,7 @@
 import {ISolutionExplorerService} from 'solutionexplorer.service.contracts';
 import {ISolution, IDiagram} from 'solutionexplorer.contracts';
 import {ISolutionExplorerRepository} from 'solutionexplorer.repository.contracts';
+import {UnprocessableEntityError} from '@essential-projects/errors_ts';
 
 export class SolutionExplorerService implements ISolutionExplorerService {
 
@@ -17,9 +18,15 @@ export class SolutionExplorerService implements ISolutionExplorerService {
      * the repository should
      * throw HTTP-like Errors; we just care for the good path here; the Error needs to be handled above.
      */
-    const targetAvailable: boolean = await this._repository.openPath(pathspec);
+
+    //  Cleanup name if '/' at the end {{{ //
+    //  TODO: Replace this by a proper RegEx
+    const slicedPathspec: string = pathspec.slice(-1)[0] === '/' ? pathspec.slice(0, -1) : pathspec;
+    //  }}} Cleanup name if '/' at the end //<
+
+    const targetAvailable: boolean = await this._repository.openPath(slicedPathspec);
     if (targetAvailable) {
-      this._pathspec = pathspec;
+      this._pathspec = slicedPathspec;
     }
     return Promise.resolve(true);
   }
@@ -29,11 +36,8 @@ export class SolutionExplorerService implements ISolutionExplorerService {
 
     const pathspec = this._pathspec;
 
-    //  Cleanup name if '/' at the end {{{ //
-    //  TODO: Replace this by a proper RegEx
-    const name: string = pathspec.slice(-1)[0] === '/' ? pathspec.slice(0, -1) : pathspec;
-    const uri: string = pathspec.slice(-1)[0] === '/' ? pathspec.slice(0, -1) : pathspec;
-    //  }}} Cleanup name if '/' at the end //
+    const name: string = pathspec;
+    const uri: string = pathspec;
 
     return {
       name: name,
@@ -42,13 +46,14 @@ export class SolutionExplorerService implements ISolutionExplorerService {
     };
   }
 
-  public async saveSolution(solution: ISolution): Promise<boolean> {
-    const promises: Array<Promise<boolean>> = solution.diagrams.map((diagram: IDiagram) => {
-      return this.saveDiagram(diagram);
-    });
-    await Promise.all(promises);
+  public async saveSolution(solution: ISolution, path?: string): Promise<boolean> {
+    const solutionPathDosentMatchCurrentPathSpec: boolean = solution.uri !== this._pathspec;
 
-    return Promise.resolve(true);
+    if (solutionPathDosentMatchCurrentPathSpec) {
+      return false;
+    }
+
+    return this._repository.saveSolution(solution, path);
   }
 
   public loadDiagram(diagramName: string): Promise<IDiagram> {

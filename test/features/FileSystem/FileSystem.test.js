@@ -80,11 +80,9 @@ describe('Solution Explorer Tests Using Filesystem', function() {
        */
       const success = await service.openSolution(brokenPathSpec);
     } catch (e) {
-      console.log(e);
-      e.code === 404 ? assert.ok() : assert.fail();
+      assert.ok(e.code === 404);
     }
-    assert.fail();
-  })
+  });
 
   it('Should Not Save a Solution With Broken URI.', async () => {
     /*
@@ -95,7 +93,7 @@ describe('Solution Explorer Tests Using Filesystem', function() {
     const solution = await service.loadSolution();
     solution.uri = brokenPathSpec;
     const saveNotSuccessfull = !await service.saveSolution(solution);
-    assert.ok(saveNotSuccessfull)
+    assert.ok(saveNotSuccessfull);
   });
 
   it(`Should Not Save a Solution to Broken Location '${brokenPathSpec}'.`, async () => {
