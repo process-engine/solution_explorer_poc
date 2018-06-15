@@ -25,6 +25,12 @@ export class SolutionExplorerFileSystemRepository implements ISolutionExplorerRe
     }
   }
 
+  private async _checkWriteablity(filePath: string): Promise<void> {
+    const directoryPath: string = path.dirname(filePath);
+
+    await this._checkForDirectory(directoryPath);
+  }
+
   public async openPath(pathspec: string, identity: IIdentity): Promise<void> {
     await this._checkForDirectory(pathspec);
 
@@ -79,23 +85,31 @@ export class SolutionExplorerFileSystemRepository implements ISolutionExplorerRe
     return diagram;
   }
 
-  // check path before check
-  // interface doc override
-  public async saveDiagram(diagramToSave: IDiagram): Promise<void> {
-    const fullPathToFile: string = path.join(this._basePath, `${diagramToSave.name}.bpmn`);
+  public async saveDiagram(diagramToSave: IDiagram, newPathSpec?: string): Promise<void> {
+    const newPathSpecWasSet: boolean = newPathSpec !== null && newPathSpec !== undefined;
 
-    const uriOfDiagramWasChanged: boolean = fullPathToFile !== diagramToSave.uri;
+    let pathToWriteDiagram: string;
 
-    if (uriOfDiagramWasChanged) {
-      throw new BadRequestError(`Uri of diagram was changed.`);
+    if (newPathSpecWasSet) {
+      pathToWriteDiagram = newPathSpec;
+
+    } else {
+      const expectedUriForDiagram: string = path.join(this._basePath, `${diagramToSave.name}.bpmn`);
+
+      const uriOfDiagramWasChanged: boolean = expectedUriForDiagram !== diagramToSave.uri;
+      if (uriOfDiagramWasChanged) {
+        throw new BadRequestError('Uri of diagram was changed.');
+      }
+
+      pathToWriteDiagram = diagramToSave.uri;
     }
 
-    await this._checkForDirectory(this._basePath);
+    await this._checkWriteablity(pathToWriteDiagram);
 
     try {
-      await fs.writeFile(fullPathToFile, diagramToSave.xml);
+      await fs.writeFile(pathToWriteDiagram, diagramToSave.xml);
     } catch (e) {
-      const error: BadRequestError = new BadRequestError('asd');
+      const error: BadRequestError = new BadRequestError('Unable to save diagram.');
       error.additionalInformation = e;
       throw error;
     }
