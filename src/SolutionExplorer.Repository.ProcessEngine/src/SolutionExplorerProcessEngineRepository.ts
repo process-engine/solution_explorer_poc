@@ -65,6 +65,20 @@ export class SolutionExplorerProcessEngineRepository implements ISolutionExplore
   }
 
   public async saveSolution(solution: ISolution, pathspec?: string): Promise<void> {
+    if (pathspec) {
+
+      try {
+        await this.openPath(pathspec, this._identity);
+      } catch (e) {
+        throw new NotFoundError('Given Pathspec was not reachable');
+      }
+
+      solution.uri = pathspec;
+      solution.diagrams.forEach((diagram: IDiagram) => {
+        diagram.uri = `${pathspec}/datastore/ProcessDef/${diagram.id}`;
+      });
+    }
+
     const promises: Array<Promise<void>> = solution.diagrams.map((diagram: IDiagram) => {
       return this.saveDiagram(diagram);
     });
@@ -103,6 +117,7 @@ export class SolutionExplorerProcessEngineRepository implements ISolutionExplore
     const diagram: IDiagram = {
       name: processDef.name,
       xml: processDef.xml,
+      id: processDef.id,
       uri: `${this._baseUri}/${processDef.id}`,
     };
     return diagram;

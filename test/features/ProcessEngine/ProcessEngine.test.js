@@ -100,7 +100,7 @@ describe('Solution Explorer Tests Using Local Database.', function() {
     try {
       await service.saveSolution(solution, brokenPathSpec);
     } catch (error) {
-      assert.equal(error.code, 400);
+      assert.equal(error.code, 404);
       return;
     }
     assert.fail('Error was not thrown.');
@@ -112,7 +112,7 @@ describe('Solution Explorer Tests Using Local Database.', function() {
     const solution = await service.loadSolution();
     const diagram = await service.loadDiagram(solution.diagrams[0].name);
     diagram.uri = brokenPathSpec;
-    // boom
+
     try {
       await service.saveDiagram(diagram);
     } catch(error) {
