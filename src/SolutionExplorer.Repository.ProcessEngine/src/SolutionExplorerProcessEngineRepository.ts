@@ -2,8 +2,8 @@ import {IQueryClause, IIdentity} from '@essential-projects/core_contracts';
 import {IPagination, ISolutionExplorerRepository} from 'solutionexplorer.repository.contracts';
 import {IProcessDefEntity} from '@process-engine/process_engine_contracts';
 import {IDiagram, ISolution} from 'solutionexplorer.contracts';
-import {get, post, plugins, Response, RequestOptions} from 'popsicle';
 import {NotFoundError, InternalServerError} from '@essential-projects/errors_ts';
+import fetch from 'node-fetch';
 
 export class SolutionExplorerProcessEngineRepository implements ISolutionExplorerRepository {
 
@@ -16,9 +16,9 @@ export class SolutionExplorerProcessEngineRepository implements ISolutionExplore
     }
     const baseUri: string = `${pathspec}/datastore/ProcessDef`;
 
-    let response: Response;
+    let response: BodyInit;
     try {
-      response = await get(baseUri);
+      response = await fetch(baseUri);
     } catch (e) {
       throw new NotFoundError('Datastore not reachable');
     }
@@ -33,11 +33,10 @@ export class SolutionExplorerProcessEngineRepository implements ISolutionExplore
   }
 
   public async getDiagrams(): Promise<Array<IDiagram>> {
-    const response: Response = await get(`${this._baseUri}/?limit="ALL"`)
-      .use(plugins.parse(['json']));
+    const response: BodyInit = await fetch(`${this._baseUri}/?limit="ALL"`)
+      .then(res => res.json());
 
-    const data: IPagination<IProcessDefEntity> = response.body;
-    const processDefList: Array<IProcessDefEntity> = data.data;
+    const processDefList: Array<IProcessDefEntity> = response.data;
 
     const diagrams: Array<IDiagram> = processDefList.map(this._mapProcessDefToDiagram);
 
@@ -53,11 +52,9 @@ export class SolutionExplorerProcessEngineRepository implements ISolutionExplore
 
     const url: string = `${this._baseUri}/?query=${JSON.stringify(query)}`;
 
-    const response: Response = await get(url)
-      .use(plugins.parse(['json']));
-
-    const data: IPagination<IProcessDefEntity> = response.body;
-    const processDefList: Array<IProcessDefEntity> = data.data;
+    const response: BodyInit = await fetch(url)
+      .then(res => res.json());
+    const processDefList: Array<IProcessDefEntity> = response.data;
 
     const diagrams: IDiagram = this._mapProcessDefToDiagram(processDefList[0]);
 
@@ -87,8 +84,8 @@ export class SolutionExplorerProcessEngineRepository implements ISolutionExplore
   }
 
   public async saveDiagram(diagramToSave: IDiagram, pathspec?: string): Promise<void> {
-    const options: RequestOptions = {
-      url: `${diagramToSave.uri}/updateBpmn`,
+    const options: Object = {
+      method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
@@ -97,15 +94,15 @@ export class SolutionExplorerProcessEngineRepository implements ISolutionExplore
       }),
     };
 
-    let response: Response;
+    let response: BodyInit;
     try {
-      response = await post(options)
-        .use(plugins.parse(['json']));
+      response = await fetch(`${diagramToSave.uri}/updateBpmn`, options)
+        .then(res => res.json());
     } catch(e) {
       throw new NotFoundError('Datastore not reachable');
     }
 
-    const body: {result: boolean} = response.body;
+    const body: {result: boolean} = response;
     const saveNotSucessfull: boolean = body.result === false;
 
     if (saveNotSucessfull) {
