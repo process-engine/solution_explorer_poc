@@ -1,13 +1,14 @@
 import {ISolutionExplorerRepository} from 'solutionexplorer.repository.contracts';
-import {BadRequestError, NotFoundError} from '@essential-projects/errors_ts';
+import {BaseError, BadRequestError, NotFoundError} from '@essential-projects/errors_ts';
 import {IIdentity} from '@essential-projects/core_contracts';
 import {IDiagram, ISolution} from 'solutionexplorer.contracts';
-import * as fs from 'fs-extra';
+
+import * as fs from 'fs';
 import * as path from 'path';
 
 const BPMN_FILE_SUFFIX: string = '.bpmn';
 
-export class SolutionExplorerFileSystemRepository implements ISolutionExplorerRepository {
+export class SolutionExplorerFileSystemRepository {
 
   private _basePath: string;
   private _identity: IIdentity;
@@ -20,8 +21,8 @@ export class SolutionExplorerFileSystemRepository implements ISolutionExplorerRe
   }
 
   public async getDiagrams(): Promise<Array<IDiagram>> {
-    const filesInDirectory: Array<string> = await fs.readdir(this._basePath);
-
+    const filesInDirectory: Array<string> = await fs.readdirSync(this._basePath);
+    console.log(filesInDirectory)
     const bpmnFiles: Array<string> = [];
 
     for (const file of filesInDirectory) {
@@ -30,37 +31,37 @@ export class SolutionExplorerFileSystemRepository implements ISolutionExplorerRe
       }
     }
 
-    const diagrams: Array<Promise<IDiagram>> = bpmnFiles
+    const diagrams: Array<IDiagram> = bpmnFiles
       .map((file: string) => {
 
         const fullPathToFile: string = path.join(this._basePath, file);
         const fileNameWithoutBpmnSuffix = file.substr(0, file.length - BPMN_FILE_SUFFIX.length);
 
-        const xmlPromise: Promise<string> = fs.readFile(fullPathToFile, 'utf8');
+        const xml: string = fs.readFileSync(fullPathToFile, 'utf8');
 
-        return xmlPromise.then((xml: string) => {
-          const diagram: IDiagram = {
-            name: fileNameWithoutBpmnSuffix,
-            uri: fullPathToFile,
-            xml: xml
-          };
+        const diagram: IDiagram = {
+          name: fileNameWithoutBpmnSuffix,
+          uri: fullPathToFile,
+          xml: xml,
+          id: fullPathToFile
+        };
 
-          return diagram;
-        });
+        return diagram;
     });
 
-    return Promise.all(diagrams);
+    return diagrams;
   }
 
   public async getDiagramByName(diagramName: string): Promise<IDiagram> {
     const fullPathToFile: string = path.join(this._basePath, `${diagramName}.bpmn`);
 
-    const xml: string = await fs.readFile(fullPathToFile, 'utf8');
+    const xml: string = await fs.readFileSync(fullPathToFile, 'utf8');
 
     const diagram: IDiagram = {
       name: diagramName,
       uri: fullPathToFile,
-      xml: xml
+      xml: xml,
+      id: fullPathToFile
     };
 
     return diagram;
@@ -79,7 +80,7 @@ export class SolutionExplorerFileSystemRepository implements ISolutionExplorerRe
 
       const uriOfDiagramWasChanged: boolean = expectedUriForDiagram !== diagramToSave.uri;
       if (uriOfDiagramWasChanged) {
-        throw new BadRequestError('Uri of diagram was changed.');
+        throw new Error('Uri of diagram was changed.');
       }
 
       pathToWriteDiagram = diagramToSave.uri;
@@ -88,10 +89,10 @@ export class SolutionExplorerFileSystemRepository implements ISolutionExplorerRe
     await this._checkWriteablity(pathToWriteDiagram);
 
     try {
-      await fs.writeFile(pathToWriteDiagram, diagramToSave.xml);
+      await fs.writeFileSync(pathToWriteDiagram, diagramToSave.xml);
     } catch (e) {
-      const error: BadRequestError = new BadRequestError('Unable to save diagram.');
-      error.additionalInformation = e;
+      const error: Error = new Error('Unable to save diagram.');
+      // error.additionalInformation = e;
       throw error;
     }
   }
@@ -111,15 +112,15 @@ export class SolutionExplorerFileSystemRepository implements ISolutionExplorerRe
   }
 
   private async _checkForDirectory(directoryPath: string): Promise<void> {
-    const pathDoesNotExist: boolean = !await fs.pathExists(directoryPath);
+    const pathDoesNotExist: boolean = !fs.existsSync(directoryPath);
     if (pathDoesNotExist) {
-      throw new NotFoundError(`'${directoryPath}' does not exist.`);
+      throw new Error(`'${directoryPath}' does not exist.`);
     }
 
-    const stat: fs.Stats = await fs.stat(directoryPath);
+    const stat: fs.Stats = fs.statSync(directoryPath);
     const isNotDirectory: boolean = !stat.isDirectory();
     if (isNotDirectory) {
-      throw new NotFoundError(`'${directoryPath}' is not an directory.`);
+      throw new Error(`'${directoryPath}' is not an directory.`);
     }
   }
 
