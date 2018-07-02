@@ -9,6 +9,7 @@ export interface ISolutionExplorerService {
    * @param pathspec The path specification to load.
    * @param identity The identity that is used to authorize, currently unused.
    */
+  // TODO: Bitte die identity nach vorne als ersten Parameter setzen.
   openSolution(pathspec: string, identity: IIdentity): Promise<void>;
 
   /**
