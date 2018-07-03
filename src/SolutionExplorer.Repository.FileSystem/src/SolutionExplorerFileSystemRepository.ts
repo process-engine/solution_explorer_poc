@@ -22,7 +22,6 @@ export class SolutionExplorerFileSystemRepository {
 
   public async getDiagrams(): Promise<Array<IDiagram>> {
     const filesInDirectory: Array<string> = await fs.readdirSync(this._basePath);
-    console.log(filesInDirectory)
     const bpmnFiles: Array<string> = [];
 
     for (const file of filesInDirectory) {
@@ -69,10 +68,11 @@ export class SolutionExplorerFileSystemRepository {
 
   public async saveDiagram(diagramToSave: IDiagram, newPathSpec?: string): Promise<void> {
     const newPathSpecWasSet: boolean = newPathSpec !== null && newPathSpec !== undefined;
-
     let pathToWriteDiagram: string;
 
     if (newPathSpecWasSet) {
+      this._checkForDirectory(newPathSpec);
+      this._checkWriteablity(newPathSpec);
       pathToWriteDiagram = newPathSpec;
 
     } else {
@@ -80,7 +80,7 @@ export class SolutionExplorerFileSystemRepository {
 
       const uriOfDiagramWasChanged: boolean = expectedUriForDiagram !== diagramToSave.uri;
       if (uriOfDiagramWasChanged) {
-        throw new Error('Uri of diagram was changed.');
+        throw new BaseError(400, 'Uri of diagram was changed.');
       }
 
       pathToWriteDiagram = diagramToSave.uri;
@@ -114,13 +114,13 @@ export class SolutionExplorerFileSystemRepository {
   private async _checkForDirectory(directoryPath: string): Promise<void> {
     const pathDoesNotExist: boolean = !fs.existsSync(directoryPath);
     if (pathDoesNotExist) {
-      throw new Error(`'${directoryPath}' does not exist.`);
+      throw new NotFoundError(`'${directoryPath}' does not exist.`);
     }
 
     const stat: fs.Stats = fs.statSync(directoryPath);
     const isNotDirectory: boolean = !stat.isDirectory();
     if (isNotDirectory) {
-      throw new Error(`'${directoryPath}' is not an directory.`);
+      throw new BaseError(400, `'${directoryPath}' is not an directory.`);
     }
   }
 

@@ -43,7 +43,7 @@ export class SolutionExplorerService implements ISolutionExplorerService {
     const solutionPathDosentMatchCurrentPathSpec: boolean = solution.uri !== this._pathspec;
 
     if (solutionPathDosentMatchCurrentPathSpec) {
-      throw new Error(`'${solution.uri}' dosent match opened pathspec '${this._pathspec}'.`);
+      throw new BadRequestError(`'${solution.uri}' dosent match opened pathspec '${this._pathspec}'.`);
     }
 
     await this._repository.saveSolution(solution, path);

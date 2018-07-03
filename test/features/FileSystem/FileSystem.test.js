@@ -113,8 +113,9 @@ describe('Solution Explorer Tests Using Filesystem', function() {
     await service.openSolution(pathspec);
     const solution = await service.loadSolution();
     const diagram = await service.loadDiagram(solution.diagrams[0].name);
-    // boom
+
     diagram.uri = brokenPathSpec;
+
     try {
       await service.saveDiagram(diagram);
     } catch (error) {
