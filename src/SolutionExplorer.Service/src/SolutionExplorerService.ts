@@ -40,6 +40,7 @@ export class SolutionExplorerService implements ISolutionExplorerService {
   }
 
   public async saveSolution(solution: ISolution, path?: string): Promise<void> {
+
     const solutionPathDosentMatchCurrentPathSpec: boolean = solution.uri !== this._pathspec;
 
     if (solutionPathDosentMatchCurrentPathSpec) {

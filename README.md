@@ -23,7 +23,11 @@ To build the project:
 
 `npm run build`
 
-To run the tests:
+Now you need to start a process-engine. To do this, follow the guide on:
+
+https://github.com/process-engine/skeleton
+
+To finally run the tests:
 
 `npm test`
 
