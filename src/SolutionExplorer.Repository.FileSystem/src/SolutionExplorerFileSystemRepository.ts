@@ -5,6 +5,7 @@ import {IDiagram, ISolution} from 'solutionexplorer.contracts';
 
 import * as fs from 'fs';
 import * as path from 'path';
+import {promisify} from 'util';
 
 const BPMN_FILE_SUFFIX: string = '.bpmn';
 
@@ -12,6 +13,10 @@ export class SolutionExplorerFileSystemRepository implements ISolutionExplorerRe
 
   private _basePath: string;
   private _identity: IIdentity;
+
+  private readDirectory = promisify(fs.readdir);
+  private readFile = promisify(fs.readFile);
+  private writeFile = promisify(fs.writeFile);
 
   public async openPath(pathspec: string, identity: IIdentity): Promise<void> {
     await this._checkForDirectory(pathspec);
@@ -21,7 +26,7 @@ export class SolutionExplorerFileSystemRepository implements ISolutionExplorerRe
   }
 
   public async getDiagrams(): Promise<Array<IDiagram>> {
-    const filesInDirectory: Array<string> = await fs.readdirSync(this._basePath);
+    const filesInDirectory: Array<string> = await this.readDirectory(this._basePath);
     const bpmnFiles: Array<string> = [];
 
     for (const file of filesInDirectory) {
@@ -30,13 +35,13 @@ export class SolutionExplorerFileSystemRepository implements ISolutionExplorerRe
       }
     }
 
-    const diagrams: Array<IDiagram> = bpmnFiles
-      .map((file: string) => {
+    const diagrams: Array<Promise<IDiagram>> = bpmnFiles
+      .map(async (file: string) => {
 
         const fullPathToFile: string = path.join(this._basePath, file);
         const fileNameWithoutBpmnSuffix = file.substr(0, file.length - BPMN_FILE_SUFFIX.length);
 
-        const xml: string = fs.readFileSync(fullPathToFile, 'utf8');
+        const xml: string = await this.readFile(fullPathToFile, 'utf8');
 
         const diagram: IDiagram = {
           name: fileNameWithoutBpmnSuffix,
@@ -48,13 +53,13 @@ export class SolutionExplorerFileSystemRepository implements ISolutionExplorerRe
         return diagram;
     });
 
-    return diagrams;
+    return Promise.all(diagrams);
   }
 
   public async getDiagramByName(diagramName: string): Promise<IDiagram> {
     const fullPathToFile: string = path.join(this._basePath, `${diagramName}.bpmn`);
 
-    const xml: string = await fs.readFileSync(fullPathToFile, 'utf8');
+    const xml: string = await this.readFile(fullPathToFile, 'utf8');
 
     const diagram: IDiagram = {
       name: diagramName,
@@ -89,7 +94,7 @@ export class SolutionExplorerFileSystemRepository implements ISolutionExplorerRe
     await this._checkWriteablity(pathToWriteDiagram);
 
     try {
-      await fs.writeFileSync(pathToWriteDiagram, diagramToSave.xml);
+      await this.writeFile(pathToWriteDiagram, diagramToSave.xml);
     } catch (e) {
       const error: Error = new Error('Unable to save diagram.');
       // error.additionalInformation = e;
