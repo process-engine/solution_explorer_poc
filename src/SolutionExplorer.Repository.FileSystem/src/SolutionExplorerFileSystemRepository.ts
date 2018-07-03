@@ -1,5 +1,5 @@
 import {ISolutionExplorerRepository} from 'solutionexplorer.repository.contracts';
-import {BaseError, BadRequestError, NotFoundError} from '@essential-projects/errors_ts';
+import {BadRequestError, InternalServerError, NotFoundError} from '@essential-projects/errors_ts';
 import {IIdentity} from '@essential-projects/core_contracts';
 import {IDiagram, ISolution} from 'solutionexplorer.contracts';
 
@@ -82,7 +82,7 @@ export class SolutionExplorerFileSystemRepository implements ISolutionExplorerRe
 
       const uriOfDiagramWasChanged: boolean = expectedUriForDiagram !== diagramToSave.uri;
       if (uriOfDiagramWasChanged) {
-        throw new BadRequestError('Uri of diagram was changed.');
+        throw new BadRequestError('Target Location (URI) of diagram was changed; Moving a diagram is currently not supported.');
       }
 
       pathToWriteDiagram = diagramToSave.uri;
@@ -93,7 +93,7 @@ export class SolutionExplorerFileSystemRepository implements ISolutionExplorerRe
     try {
       await this._writeFile(pathToWriteDiagram, diagramToSave.xml);
     } catch (e) {
-      const error: BadRequestError = new BadRequestError('Unable to save diagram.');
+      const error: InternalServerError = new InternalServerError('Unable to save diagram.');
       error.additionalInformation = e;
       throw error;
     }
@@ -120,9 +120,9 @@ export class SolutionExplorerFileSystemRepository implements ISolutionExplorerRe
     }
 
     const stat: fs.Stats = fs.statSync(directoryPath);
-    const isNotDirectory: boolean = !stat.isDirectory();
-    if (isNotDirectory) {
-      throw new BadRequestError(`'${directoryPath}' is not an directory.`);
+    const pathIsNotADirectory: boolean = !stat.isDirectory();
+    if (pathIsNotADirectory) {
+      throw new BadRequestError(`'${directoryPath}' is not a directory.`);
     }
   }
 
