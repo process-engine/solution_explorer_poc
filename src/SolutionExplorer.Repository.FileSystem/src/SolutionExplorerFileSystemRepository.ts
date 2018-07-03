@@ -82,7 +82,7 @@ export class SolutionExplorerFileSystemRepository implements ISolutionExplorerRe
 
       const uriOfDiagramWasChanged: boolean = expectedUriForDiagram !== diagramToSave.uri;
       if (uriOfDiagramWasChanged) {
-        throw new BaseError(400, 'Uri of diagram was changed.');
+        throw new BadRequestError('Uri of diagram was changed.');
       }
 
       pathToWriteDiagram = diagramToSave.uri;
