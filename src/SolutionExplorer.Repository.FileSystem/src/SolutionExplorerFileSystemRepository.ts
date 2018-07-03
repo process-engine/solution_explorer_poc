@@ -63,7 +63,8 @@ export class SolutionExplorerFileSystemRepository implements ISolutionExplorerRe
     const diagram: IDiagram = {
       name: diagramName,
       uri: fullPathToFile,
-      xml: xml
+      xml: xml,
+      id: fullPathToFile,
     };
 
     return diagram;

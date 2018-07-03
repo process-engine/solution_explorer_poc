@@ -13,8 +13,7 @@ describe('Solution Explorer Tests Using Local Database.', function() {
   // Good Case Tests {{{ //
   it('Should Open a Solution.', async () => {
     const service = await test;
-    const success = await service.openSolution(pathspec);
-    assert.ok(success);
+    await service.openSolution(pathspec);
   })
 
   it('Should Load a Solution.', async () => {
@@ -28,16 +27,14 @@ describe('Solution Explorer Tests Using Local Database.', function() {
     const service = await test;
     await service.openSolution(pathspec);
     const solution = await service.loadSolution();
-    const success = await service.saveSolution(solution);
-    assert.ok(success)
+    await service.saveSolution(solution);
   });
 
   it(`Should Save a Solution to Location '${pathspec}'.`, async () => {
     const service = await test;
     await service.openSolution(pathspec);
     const solution = await service.loadSolution();
-    const success = await service.saveSolution(solution, pathspec);
-    assert.ok(success)
+    await service.saveSolution(solution, pathspec);
   });
 
   it('Should Load a Diagram.', async () => {
@@ -53,24 +50,21 @@ describe('Solution Explorer Tests Using Local Database.', function() {
     await service.openSolution(pathspec);
     const solution = await service.loadSolution();
     const diagram = await service.loadDiagram(solution.diagrams[0].name);
-    const success = await service.saveDiagram(diagram);
-    assert.ok(success);
-  })
+    await service.saveDiagram(diagram);
+  }).timeout(60000);
   // }}} Good Case Tests //
 
   // Bad Case Tests {{{ //
   it('Should Raise an NotFound Error While Opening a Solution.', async () => {
     const service = await test;
+
     try {
-      /*
-       * Currently the implementation of openSolution() will always
-       * return true; this behaviour is wrong.
-       */
-      const success = await service.openSolution(brokenPathSpec);
-    } catch (e) {
-      e.errorCode === 404 ? assert.ok() : assert.fail();
+      await service.openSolution(brokenPathSpec);
+    } catch (error) {
+      assert.equal(error._code, 404);
+      return;
     }
-    assert.fail();
+    assert.fail('Error was not thrown.');
   })
 
   it('Should Not Save a Solution With Broken URI.', async () => {
@@ -81,8 +75,14 @@ describe('Solution Explorer Tests Using Local Database.', function() {
     await service.openSolution(pathspec);
     const solution = await service.loadSolution();
     solution.uri = brokenPathSpec;
-    const saveNotSuccessfull = !await service.saveSolution(solution);
-    assert.ok(saveNotSuccessfull)
+
+    try {
+      await service.saveSolution(solution);
+    } catch (error) {
+      assert.equal(error.code, 400);
+      return;
+    }
+    assert.fail('Error was not thrown.');
   });
 
   it(`Should Not Save a Solution to Broken Location '${brokenPathSpec}'.`, async () => {
@@ -93,8 +93,17 @@ describe('Solution Explorer Tests Using Local Database.', function() {
     const service = await test;
     await service.openSolution(pathspec);
     const solution = await service.loadSolution();
-    const unableToSaveSulution = !await service.saveSolution(solution, brokenPathSpec);
-    assert.ok(unableToSaveSulution)
+    /**
+     * The function saveSolution doesn't use its second parameter right now.
+     * Need to be implemented.
+     */
+    try {
+      await service.saveSolution(solution, brokenPathSpec);
+    } catch (error) {
+      assert.equal(error.code, 404);
+      return;
+    }
+    assert.fail('Error was not thrown.');
   });
 
   it('Should Not Save a Diagram, due to Wrong Diagram URI.', async () => {
@@ -103,9 +112,14 @@ describe('Solution Explorer Tests Using Local Database.', function() {
     const solution = await service.loadSolution();
     const diagram = await service.loadDiagram(solution.diagrams[0].name);
     diagram.uri = brokenPathSpec;
-    // boom
-    const success = await service.saveDiagram(diagram);
-    assert.ok(success);
+
+    try {
+      await service.saveDiagram(diagram);
+    } catch(error) {
+      assert.equal(error.code, 404);
+      return;
+    }
+    assert.fail('Error was not thrown.');
   })
   // }}} Bad Case Tests //
 })
