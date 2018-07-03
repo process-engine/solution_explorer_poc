@@ -22,12 +22,12 @@ export class SolutionExplorerProcessEngineRepository implements ISolutionExplore
     try {
       response = await fetch(baseUri);
     } catch (e) {
-      throw new NotFoundError('Datastore not reachable');
+      throw new NotFoundError('Datastore not reachable.');
     }
 
     const statusWasNotOk = response.status !== 200;
     if (statusWasNotOk) {
-      throw new NotFoundError('Solution was not found');
+      throw new NotFoundError('Solution was not found.');
     }
 
     this._baseUri = baseUri;
@@ -69,7 +69,7 @@ export class SolutionExplorerProcessEngineRepository implements ISolutionExplore
       try {
         await this.openPath(pathspec, this._identity);
       } catch (e) {
-        throw new NotFoundError('Given Pathspec was not reachable');
+        throw new NotFoundError('Given path is not reachable.');
       }
 
       solution.uri = pathspec;
@@ -101,14 +101,14 @@ export class SolutionExplorerProcessEngineRepository implements ISolutionExplore
       response = await fetch(`${diagramToSave.uri}/updateBpmn`, options)
         .then(res => res.json());
     } catch(e) {
-      throw new NotFoundError('Datastore not reachable');
+      throw new NotFoundError('Datastore is not reachable.');
     }
 
     const body: {result: boolean} = response;
     const saveNotSucessfull: boolean = body.result === false;
 
     if (saveNotSucessfull) {
-      throw new InternalServerError('Diagram could not be saved');
+      throw new InternalServerError('Diagram could not be saved.');
     }
   }
 
