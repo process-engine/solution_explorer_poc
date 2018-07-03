@@ -8,7 +8,7 @@ import * as path from 'path';
 
 const BPMN_FILE_SUFFIX: string = '.bpmn';
 
-export class SolutionExplorerFileSystemRepository {
+export class SolutionExplorerFileSystemRepository implements ISolutionExplorerRepository {
 
   private _basePath: string;
   private _identity: IIdentity;
