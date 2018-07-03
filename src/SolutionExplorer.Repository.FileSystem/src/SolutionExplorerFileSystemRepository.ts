@@ -46,8 +46,7 @@ export class SolutionExplorerFileSystemRepository implements ISolutionExplorerRe
         const diagram: IDiagram = {
           name: fileNameWithoutBpmnSuffix,
           uri: fullPathToFile,
-          xml: xml,
-          id: fullPathToFile
+          xml: xml
         };
 
         return diagram;
@@ -64,8 +63,7 @@ export class SolutionExplorerFileSystemRepository implements ISolutionExplorerRe
     const diagram: IDiagram = {
       name: diagramName,
       uri: fullPathToFile,
-      xml: xml,
-      id: fullPathToFile
+      xml: xml
     };
 
     return diagram;
@@ -76,8 +74,7 @@ export class SolutionExplorerFileSystemRepository implements ISolutionExplorerRe
     let pathToWriteDiagram: string;
 
     if (newPathSpecWasSet) {
-      this._checkForDirectory(newPathSpec);
-      this._checkWriteablity(newPathSpec);
+
       pathToWriteDiagram = newPathSpec;
 
     } else {
@@ -96,8 +93,8 @@ export class SolutionExplorerFileSystemRepository implements ISolutionExplorerRe
     try {
       await this.writeFile(pathToWriteDiagram, diagramToSave.xml);
     } catch (e) {
-      const error: Error = new Error('Unable to save diagram.');
-      // error.additionalInformation = e;
+      const error: BadRequestError = new BadRequestError('Unable to save diagram.');
+      error.additionalInformation = e;
       throw error;
     }
   }
