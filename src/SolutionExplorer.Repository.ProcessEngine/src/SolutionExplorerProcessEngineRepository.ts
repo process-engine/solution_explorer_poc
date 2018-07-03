@@ -3,7 +3,9 @@ import {IPagination, ISolutionExplorerRepository} from 'solutionexplorer.reposit
 import {IProcessDefEntity} from '@process-engine/process_engine_contracts';
 import {IDiagram, ISolution} from 'solutionexplorer.contracts';
 import {NotFoundError, InternalServerError} from '@essential-projects/errors_ts';
-import fetch from 'node-fetch';
+import * as fetch_ponyfill from 'fetch-ponyfill';
+
+const fetch: (url: string | Request, init?: RequestInit) => Promise<Response> = fetch_ponyfill().fetch;
 
 export class SolutionExplorerProcessEngineRepository implements ISolutionExplorerRepository {
 

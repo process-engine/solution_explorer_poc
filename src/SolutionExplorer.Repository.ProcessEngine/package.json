@@ -14,7 +14,7 @@
     "@essential-projects/core_contracts": "^2.0.0",
     "@essential-projects/errors_ts": "^1.2.0",
     "@process-engine/process_engine_contracts": "^9.0.0",
-    "node-fetch": "^2.1.2",
+    "fetch-ponyfill": "^6.0.2",
     "solutionexplorer.contracts": "0.0.1",
     "solutionexplorer.repository.contracts": "0.0.1"
   },
