@@ -122,7 +122,7 @@ export class SolutionExplorerFileSystemRepository implements ISolutionExplorerRe
     const stat: fs.Stats = fs.statSync(directoryPath);
     const isNotDirectory: boolean = !stat.isDirectory();
     if (isNotDirectory) {
-      throw new BaseError(400, `'${directoryPath}' is not an directory.`);
+      throw new BadRequestError(`'${directoryPath}' is not an directory.`);
     }
   }
 
